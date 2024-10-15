@@ -1,10 +1,17 @@
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 
-from config import *
+import config
 from train import train, X, y
 
-X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2, random_state=random_state, shuffle=shuffle)
+X_train, X_valid, y_train, y_valid =\
+    train_test_split(
+        X,
+        y,
+        test_size=0.2,
+        random_state=config.random_state,
+        shuffle=config.shuffle
+    )
 
 
 def evaluate(model_name):
