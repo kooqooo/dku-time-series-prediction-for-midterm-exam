@@ -23,7 +23,7 @@ def load_test_data():   # inference.py에서 사용
     df = pd.read_csv(data_path)
     df["yymm"] = df["yymm"].map(convert_to_datetime)
 
-    return X
+    return df
 
 def split_data(X, y):
     return train_test_split(X, y, test_size=0.2, random_state=random_state, shuffle=shuffle)

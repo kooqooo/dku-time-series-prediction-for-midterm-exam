@@ -17,3 +17,4 @@ def evaluate(model_name):
 
 if __name__ == "__main__":
     evaluate("XGBoost")
+    evaluate("RandomForest")

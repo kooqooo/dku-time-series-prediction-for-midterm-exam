@@ -1,5 +1,5 @@
+import time
 import timeit
-
 
 def time_wrapper(func):
     def wrapper(*args, **kwargs):
@@ -10,13 +10,14 @@ def time_wrapper(func):
         return result
     return wrapper
 
+def get_current_time():
+    return time.strftime("%Y-%m-%d_%H-%M-%S")
 
 if __name__ == "__main__":
-    import time
-
     @time_wrapper
     def test():
-        time.sleep(2)
+        time.sleep(0.1)
         return "Hello"
     
     print(test())
+    print(get_current_time())
