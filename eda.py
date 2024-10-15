@@ -1,13 +1,13 @@
 from datetime import datetime
 
-import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
 from statsmodels.tsa.seasonal import seasonal_decompose
-import numpy as np
 
 # 데이터 로드 (여기서는 이전에 처리한 df를 사용한다고 가정합니다)
-df = pd.read_csv('data/train.csv')  # 필요하다면 이 줄을 사용하여 데이터를 로드하세요
+df = pd.read_csv("data/train.csv")  # 필요하다면 이 줄을 사용하여 데이터를 로드하세요
 
 # # 기본 정보 확인
 # print(df.info())
@@ -19,11 +19,13 @@ df = pd.read_csv('data/train.csv')  # 필요하다면 이 줄을 사용하여 �
 
 year = 2022
 
+
 def convert_to_datetime(date_string):
     yymm = date_string[:4]
     time = date_string[5:]
     full_date_string = f"{year}{yymm}{time}"
     return datetime.strptime(full_date_string, "%Y%m%d%H:%M")
+
 
 df["datetime"] = df["yymm"].apply(convert_to_datetime)
 
@@ -169,15 +171,15 @@ df["datetime"] = df["yymm"].apply(convert_to_datetime)
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
 print(df.info())
-df = df.drop('yymm', axis=1)
-df = df.drop('datetime', axis=1)
+df = df.drop("yymm", axis=1)
+df = df.drop("datetime", axis=1)
 plt.figure(figsize=(12, 6))
-plot_acf(df['Target'], lags=144, ax=plt.gca())  # 24시간 * 6 (10분 간격)
-plt.title('Autocorrelation Function')
+plot_acf(df["Target"], lags=144, ax=plt.gca())  # 24시간 * 6 (10분 간격)
+plt.title("Autocorrelation Function")
 plt.show()
 
 # 부분 자기상관 분석
 plt.figure(figsize=(12, 6))
-plot_pacf(df['Target'], lags=144, ax=plt.gca())
-plt.title('Partial Autocorrelation Function')
+plot_pacf(df["Target"], lags=144, ax=plt.gca())
+plt.title("Partial Autocorrelation Function")
 plt.show()
