@@ -1,3 +1,5 @@
+from time import time
+
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
@@ -22,13 +24,14 @@ X_train, X_test, y_train, y_test = train_test_split(
 rf = RandomForestRegressor(random_state=42)
 
 param_grid = {
-    "n_estimators": [100, 200, 300, 400, 500],  # 결정 트리의 개수
-    "max_depth": [None, 10, 20, 30, 40],  # 트리의 최대 깊이
-    "min_samples_split": [2, 5, 10, 15],  # 내부 노드를 분할하기 위한 최소 샘플 수
-    "min_samples_leaf": [1, 2, 4, 6],  # 리프 노드에 있어야 하는 최소 샘플 수
-    "max_features": ["sqrt", "log2"],  # 각 트리를 분할할 때 고려할 최대 feature 수
+    'max_depth': [*range(1, 10)],   # 트리의 최대 깊이
+    'max_features': ['log2', 'sqrt'],   # 각 트리를 분할할 때 고려할 최대 feature 수
+    'min_samples_leaf': [*range(1, 10)],    # 리프 노드에 있어야 하는 최소 샘플 수
+    'min_samples_split': [*range(10, 21), 30],  # 내부 노드를 분할하기 위한 최소 샘플 수
+    'n_estimators': [*range(45, 66, 5), 80],    # 결정 트리의 개수
 }
 
+start = time()
 grid_search = GridSearchCV(
     estimator=rf,
     param_grid=param_grid,
@@ -50,3 +53,4 @@ y_pred = best_rf.predict(X_test)
 # MAE 평가
 mae = mean_absolute_error(y_test, y_pred)
 print("Mean Absolute Error:", mae)
+print(f"Time: {time() - start:.2f}")
