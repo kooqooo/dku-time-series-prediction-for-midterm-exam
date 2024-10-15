@@ -6,7 +6,7 @@ def time_wrapper(func):
         start = timeit.default_timer()
         result = func(*args, **kwargs)
         end = timeit.default_timer()
-        print(f"Elapsed time: {end - start}")
+        print(f"{func.__name__} 실행 시간 : {end - start:.2f}초")
         return result
     return wrapper
 

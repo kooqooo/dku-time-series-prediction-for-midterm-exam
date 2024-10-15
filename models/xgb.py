@@ -25,7 +25,7 @@ X = drop_columns(['Target', 'yymm'], data)
 # X = drop_columns(['Target', 'yymm', 'V1', 'V2', 'V11', 'V3', 'V4', 'V5', 'V6', 'V8', 'V9', 'V7', 'V10', 'V12', 'V13'], data)
 y = data['Target']
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
 # XGBoost 모델 생성 및 학습
 model = xgb.XGBRegressor()
@@ -59,4 +59,4 @@ test_data = drop_columns(['yymm'], test_data)
 model.fit(X, y)
 predictions = model.predict(test_data)
 test_data['predict'] = predictions
-test_data['predict'].to_csv('result2.csv', index=False)
+test_data['predict'].to_csv('result3.csv', index=False)

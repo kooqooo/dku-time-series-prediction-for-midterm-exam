@@ -9,5 +9,7 @@ def convert_to_datetime(date_string: str):
     full_date_string = f"{year}{yymm}{time}"
     return datetime.strptime(full_date_string, "%Y%m%d%H:%M")
 
-def drop_columns(columns:list[str], data):
+def drop_columns(data, columns:list[str]):
+    if not columns:
+        return data
     return data.drop(columns, axis=1)
