@@ -167,19 +167,28 @@ df["datetime"] = df["yymm"].apply(convert_to_datetime)
 # plt.tight_layout()
 # plt.show()
 
-# 자기상관 분석
-from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+# # 자기상관 분석
+# from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
-print(df.info())
-df = df.drop("yymm", axis=1)
-df = df.drop("datetime", axis=1)
-plt.figure(figsize=(12, 6))
-plot_acf(df["Target"], lags=144, ax=plt.gca())  # 24시간 * 6 (10분 간격)
-plt.title("Autocorrelation Function")
-plt.show()
+# print(df.info())
+# df = df.drop("yymm", axis=1)
+# df = df.drop("datetime", axis=1)
+# plt.figure(figsize=(12, 6))
+# plot_acf(df["Target"], lags=144, ax=plt.gca())  # 24시간 * 6 (10분 간격)
+# plt.title("Autocorrelation Function")
+# plt.show()
 
-# 부분 자기상관 분석
-plt.figure(figsize=(12, 6))
-plot_pacf(df["Target"], lags=144, ax=plt.gca())
-plt.title("Partial Autocorrelation Function")
-plt.show()
+# # 부분 자기상관 분석
+# plt.figure(figsize=(12, 6))
+# plot_pacf(df["Target"], lags=144, ax=plt.gca())
+# plt.title("Partial Autocorrelation Function")
+# plt.show()
+
+from utils.load_data import load_test_data
+test = load_test_data()
+columns = df.columns.to_list()[1:-2]
+for column in columns:
+    print(column)
+    print(f"(train) {column} 최대: {df[column].max()}, 최소: {df[column].min()}")
+    print(f"(test) {column} 최대: {test[column].max()}, 최소: {test[column].min()}")
+    print()

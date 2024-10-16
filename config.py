@@ -1,6 +1,8 @@
 random_state = 42
 shuffle = False
 columns = ["yymm"]
+scaler = "RobustScaler"
+scaler = None
 
 ## RandomForest Hyperparameters
 params = {
