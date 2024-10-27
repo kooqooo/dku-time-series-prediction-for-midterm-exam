@@ -1,12 +1,18 @@
 import config
 from train import X, train, y
 from utils.load_data import load_test_data
-from utils.preprocess import drop_columns, get_scaler
+from utils.preprocess import drop_columns, get_scaler, add_time_features
 from utils.time_utils import get_current_time
 
+# X_train = X[['V5', 'V19', 'V21', 'V25']]
 X_train = X
+
 test_data = load_test_data()
+if config.use_datetime:
+    test_data = add_time_features(test_data)
 test_data = drop_columns(test_data, columns=config.columns)
+# test_data = test_data[['V5', 'V19', 'V21', 'V25']]
+print(X_train.head())
 print(test_data.head())
 
 if config.scaler:
@@ -19,4 +25,4 @@ if config.scaler:
 model = train(X_train, y, model_name="RandomForest")
 predictions = model.predict(test_data)
 test_data["predict"] = predictions
-test_data["predict"].to_csv(f"{get_current_time()}.csv", index=False)
+test_data["predict"].to_csv(f"output/{get_current_time()}_{config.random_state}.csv", index=False)
