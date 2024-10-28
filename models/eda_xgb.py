@@ -24,7 +24,6 @@ def drop_columns(columns, data):
 data = pd.read_csv("data/train.csv")
 data["yymm"] = data["yymm"].apply(convert_to_datetime)
 X = drop_columns(["Target", "yymm"], data)
-# X = drop_columns(['Target', 'yymm', 'V1', 'V2', 'V11', 'V3', 'V4', 'V5', 'V6', 'V8', 'V9', 'V7', 'V10', 'V12', 'V13'], data)
 y = data["Target"]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
@@ -56,9 +55,8 @@ plt.show()
 # 테스트 데이터 예측
 test_data = pd.read_csv("data/test_set.csv")
 test_data = drop_columns(["yymm"], test_data)
-# test_data = drop_columns(['yymm', 'V1', 'V2', 'V11', 'V3', 'V4', 'V5', 'V6', 'V8', 'V9', 'V7', 'V10', 'V12', 'V13'], test_data)
 
 model.fit(X, y)
 predictions = model.predict(test_data)
 test_data["predict"] = predictions
-test_data["predict"].to_csv("result3.csv", index=False)
+test_data["predict"].to_csv("output/result.csv", index=False)

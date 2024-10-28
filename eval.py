@@ -28,6 +28,6 @@ def evaluate(model_name):
 
 if __name__ == "__main__":
     print("RandomState:", config.random_state)
-    # evaluate("XGBoost")
+    evaluate("XGBoost")
     evaluate("RandomForest")
-    # evaluate("LinearRegression")
+    evaluate("LinearRegression")
