@@ -1,11 +1,25 @@
-random_state = 72
+random_state = 42
 shuffle = True
-columns = ["yymm"]
+# columns = ["yymm"]
+columns = ["yymm"] + ['V1', 'V2', 'V3', 'V5', 'V6', 'V8', 'V9', 'V11', 'V12', 'V13', 'V14', 'V15', 'V16', 'V18', 'V19', 'V20', 'V24', 'V26']
 use_datetime = True
-scaler = "RobustScaler"
+# scaler = "RobustScaler"
 scaler = None
 
-# ## RandomForest Hyperparameters
+# RandomForest Hyperparameters
+params = {
+    "bootstrap": False,
+    "criterion": "squared_error",
+    "max_depth": 5,
+    "max_features": "log2",
+    "max_leaf_nodes": 8,
+    "min_samples_leaf": 3,
+    "min_samples_split": 15,
+    "n_estimators": 45,
+    "oob_score": False,
+    "warm_start": True,
+}
+
 # params = {
 #     "max_depth": 6,
 #     "max_features": "log2",
@@ -23,7 +37,6 @@ scaler = None
 #     "n_estimators": 80,
 # }
 
-# # 이게 제일 잘 나옴이 아님...
 # params = {
 #     'bootstrap': False,
 #     'ccp_alpha': 0.0,
@@ -121,15 +134,3 @@ scaler = None
 #     "warm_start": True,
 # }
 
-params = {
-    "bootstrap": False,
-    "criterion": "squared_error",
-    "max_depth": 5,
-    "max_features": "log2",
-    "max_leaf_nodes": 8,
-    "min_samples_leaf": 3,
-    "min_samples_split": 15,
-    "n_estimators": 45,
-    "oob_score": False,
-    "warm_start": True,
-}
