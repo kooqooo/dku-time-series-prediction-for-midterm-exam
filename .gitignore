@@ -1,7 +1,6 @@
 test*.py
 
 # data
-data/
 *.csv
 
 # Byte-compiled / optimized / DLL files

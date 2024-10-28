@@ -1,9 +1,11 @@
 import config
 from utils.load_data import load_train_data
-from utils.preprocess import drop_columns
+from utils.preprocess import drop_columns, add_time_features
 from utils.time_utils import time_wrapper
 
 X, y = load_train_data()
+if config.use_datetime:
+    X = add_time_features(X)
 X = drop_columns(X, columns=config.columns)
 
 
@@ -22,6 +24,10 @@ def train(X, y, model_name):
         model = RandomForestRegressor(
             random_state=config.random_state, n_jobs=-1, **config.params
         )
+    elif model_name in ["LinearRegression", "LR", "lr", "linearregression"]:
+        from sklearn.linear_model import LinearRegression
+
+        model = LinearRegression()
     else:
         raise ValueError("Invalid model_name")
 
