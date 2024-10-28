@@ -156,7 +156,7 @@ plt.title("Partial Autocorrelation Function")
 plt.show()
 
 # 각 특성의 최대값과 최소값
-columns = df.columns.to_list()[1:-2]
-for column in columns:
+drop_columns = df.columns.to_list()[1:-2]
+for column in drop_columns:
     print(f"{column} 최대: {df[column].max()}, 최소: {df[column].min()}")
     print()

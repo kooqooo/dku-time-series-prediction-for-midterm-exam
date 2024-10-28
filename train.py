@@ -6,7 +6,7 @@ from utils.time_utils import time_wrapper
 X, y = load_train_data()
 if config.use_datetime:
     X = add_time_features(X)
-X = drop_columns(X, columns=config.columns)
+X = drop_columns(X, columns=config.drop_columns)
 
 
 @time_wrapper

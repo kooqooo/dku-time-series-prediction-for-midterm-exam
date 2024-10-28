@@ -8,7 +8,7 @@ X_train = X
 test_data = load_test_data()
 if config.use_datetime:
     test_data = add_time_features(test_data)
-test_data = drop_columns(test_data, columns=config.columns)
+test_data = drop_columns(test_data, columns=config.drop_columns)
 
 print(X_train.head())
 print(test_data.head())
