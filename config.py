@@ -2,7 +2,7 @@ random_state = 42
 shuffle = True
 # columns = ["yymm"]
 columns = ["yymm"] + ['V1', 'V2', 'V3', 'V5', 'V6', 'V8', 'V9', 'V11', 'V12', 'V13', 'V14', 'V15', 'V16', 'V18', 'V19', 'V20', 'V24', 'V26']
-use_datetime = True
+use_datetime = False
 # scaler = "RobustScaler"
 scaler = None
 

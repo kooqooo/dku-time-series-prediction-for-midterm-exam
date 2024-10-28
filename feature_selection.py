@@ -11,11 +11,17 @@ from tqdm import tqdm
 
 import config
 from utils.load_data import load_train_data
-from utils.preprocess import drop_columns
+from utils.preprocess import drop_columns, add_time_features, convert_to_datetime
 from utils.time_utils import time_wrapper
 
-X, y = load_train_data()
-X = drop_columns(X, columns=config.columns)
+
+df = pd.read_csv("data/train.csv")
+df["yymm"] = df["yymm"].map(convert_to_datetime)
+if config.use_datetime:
+    df = add_time_features(df)
+X = df.drop("Target", axis=1)
+y = df["Target"]
+X = drop_columns(X, columns=["yymm"])
 
 # 훈련/테스트 데이터 분리
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -23,75 +29,49 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # 모델 정의
 model = RandomForestRegressor(random_state=config.random_state, n_jobs=-1, **config.params)
 
-# ### 1. Optimal Feature Selection using Sequential Feature Selector
-# print("== Finding Optimal Features ==")
+### 1. Optimal Feature Selection using Sequential Feature Selector
+print("== Finding Optimal Features ==")
 
-# feature_scores = []
-# for k in tqdm(range(1, X_train.shape[1])):
-#     sfs = SequentialFeatureSelector(model, n_features_to_select=k, direction='forward', cv=5, scoring='neg_mean_absolute_error')
-#     sfs.fit(X_train, y_train)
-#     score = cross_val_score(model, sfs.transform(X_train), y_train, cv=5, scoring='neg_mean_absolute_error').mean()
-#     feature_scores.append((k, score))
+feature_scores = []
+for k in tqdm(range(1, X_train.shape[1])):
+    sfs = SequentialFeatureSelector(model, n_features_to_select=k, direction='forward', cv=5, scoring='neg_mean_absolute_error')
+    sfs.fit(X_train, y_train)
+    score = cross_val_score(model, sfs.transform(X_train), y_train, cv=5, scoring='neg_mean_absolute_error').mean()
+    feature_scores.append((k, score))
 
-# # 최적의 피처 개수 선택
-# best_k = max(feature_scores, key=lambda x: x[1])[0]
-# print(f"Optimal number of features: {best_k}")
+# 최적의 피처 개수 선택
+best_k = max(feature_scores, key=lambda x: x[1])[0] # best_k = 8
+print(f"Optimal number of features: {best_k}")
 
-# # 최적의 피처로 데이터 변환
-# sfs_optimal = SequentialFeatureSelector(model, n_features_to_select=best_k, direction='forward', cv=5, scoring='neg_mean_absolute_error')
-# sfs_optimal.fit(X_train, y_train)
+# 최적의 피처로 데이터 변환
+sfs_optimal = SequentialFeatureSelector(model, n_features_to_select=best_k, direction='forward', cv=5, scoring='neg_mean_absolute_error')
+sfs_optimal.fit(X_train, y_train)
 
-# selected_features = X_train.columns[sfs_optimal.get_support()]
-# print(f"Selected Optimal Features: {selected_features.tolist()}")
+selected_features = X_train.columns[sfs_optimal.get_support()]
+print(f"Selected Optimal Features: {selected_features.tolist()}")
 
-# # 최적의 피처로 훈련 및 테스트 데이터셋 변환
-# X_train_optimal = sfs_optimal.transform(X_train)
-# X_test_optimal = sfs_optimal.transform(X_test)
+# 최적의 피처로 훈련 및 테스트 데이터셋 변환
+X_train_optimal = sfs_optimal.transform(X_train)
+X_test_optimal = sfs_optimal.transform(X_test)
 
-# ### 2. RandomForest with Optimal Features
-# print("\n== GPT RandomForest with Optimal Features ==")
+print("\n== Random Forest with Optimal Features ==")
+# 랜덤 포레스트 모델 훈련
+rf_model = RandomForestRegressor(random_state=config.random_state, n_jobs=-1, **config.params)
+rf_model.fit(X_train_optimal, y_train)
 
-# rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
-# rf_model.fit(X_train_optimal, y_train)
+# K-Fold 교차 검증 (cv=5)
+rf_cv_scores = cross_val_score(rf_model, X_train_optimal, y_train, cv=5, scoring='neg_mean_absolute_error')
+mean_mae_rf = -np.mean(rf_cv_scores)
+print(f"Cross-Validated MAE (Random Forest, Optimal Features): {mean_mae_rf}")
 
-# # K-Fold 교차 검증 (cv=5)
-# rf_cv_scores = cross_val_score(rf_model, X_train_optimal, y_train, cv=5, scoring='neg_mean_absolute_error')
-# mean_mae_rf = -np.mean(rf_cv_scores)
-# print(f"Cross-Validated MAE (Random Forest, Optimal Features): {mean_mae_rf}")
+print("\n== Random Forest with All Features ==")
+rf_model.fit(X_train, y_train)
 
-# # 최적의 피처로 테스트 데이터 예측 및 최종 MAE
-# y_pred_rf = rf_model.predict(X_test_optimal)
-# mae_rf = mean_absolute_error(y_test, y_pred_rf)
-# print(f"Test MAE (GPT Random Forest, Optimal Features): {mae_rf}")
+# K-Fold 교차 검증 (cv=5)
+rf_cv_scores = cross_val_score(rf_model, X_train, y_train, cv=5, scoring='neg_mean_absolute_error')
+mean_mae_rf = -np.mean(rf_cv_scores)
+print(f"Cross-Validated MAE (Random Forest, All Features): {mean_mae_rf}")
 
-# print("\n== GPT RandomForest with All Features ==")
-# rf_model.fit(X_train, y_train)
-
-# # K-Fold 교차 검증 (cv=5)
-# rf_cv_scores = cross_val_score(rf_model, X_train, y_train, cv=5, scoring='neg_mean_absolute_error')
-# mean_mae_rf = -np.mean(rf_cv_scores)
-# print(f"Cross-Validated MAE (GPT Random Forest, All Features): {mean_mae_rf}")
-
-# print("\n== My Random Forest with Optimal Features ==")
-# # 랜덤 포레스트 모델 훈련
-# rf_model = RandomForestRegressor(random_state=config.random_state, n_jobs=-1, **config.params)
-# rf_model.fit(X_train_optimal, y_train)
-
-# # K-Fold 교차 검증 (cv=5)
-# rf_cv_scores = cross_val_score(rf_model, X_train_optimal, y_train, cv=5, scoring='neg_mean_absolute_error')
-# mean_mae_rf = -np.mean(rf_cv_scores)
-# print(f"Cross-Validated MAE (My Random Forest, Optimal Features): {mean_mae_rf}")
-
-# print("\n== My Random Forest with All Features ==")
-# rf_model.fit(X_train, y_train)
-
-# # K-Fold 교차 검증 (cv=5)
-# rf_cv_scores = cross_val_score(rf_model, X_train, y_train, cv=5, scoring='neg_mean_absolute_error')
-# mean_mae_rf = -np.mean(rf_cv_scores)
-# print(f"Cross-Validated MAE (My Random Forest, All Features): {mean_mae_rf}")
-
-
-# # from matplotlib import pyplot as plt
 
 # 랜덤 포레스트 모델 훈련
 # rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
@@ -109,16 +89,16 @@ plt.bar(range(X_train.shape[1]), importances[indices], align="center")
 plt.xticks(range(X_train.shape[1]), X_train.columns[indices], rotation=90)
 plt.show()
 
-# # 성능 측정 결과 그래프
-# ks, scores = zip(*feature_scores)
-# plt.plot(ks, [-s for s in scores], marker='o')
-# plt.xlabel("Number of Features")
-# plt.ylabel("Mean Absolute Error (MAE)")
-# plt.title("Elbow Method for Optimal Feature Selection")
-# plt.show()
+# 성능 측정 결과 그래프
+ks, scores = zip(*feature_scores)
+plt.plot(ks, [-s for s in scores], marker='o')
+plt.xlabel("Number of Features")
+plt.ylabel("Mean Absolute Error (MAE)")
+plt.title("Elbow Method for Optimal Feature Selection")
+plt.show()
 
 # 사용할 피처 개수
-k = 4
+k = 8
 
 ### 1. 필터 방식 (Filter Method)
 print("== Filter Method ==")
