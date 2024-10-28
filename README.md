@@ -15,3 +15,4 @@
     - `config.py` : Hyper parameters 등 학습 및 추론 조건
     - `inference.py` : 추론결과 `./output`에 csv 파일 저장
     - `ensemble.py` : `./output`에 있는 모든 csv 파일 Hard voting
+    - `models/grid_search.py` : RandomForest 모델의 최적의 Hyper parameter를 찾는 Grid Search
